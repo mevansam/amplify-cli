@@ -32,3 +32,8 @@ export function unmarshall(raw, isRaw = true) {
 
   return content;
 }
+
+type TableObject<T> = { [tableName: string]: T };
+export function mapTableObject<T, R>(tableObject: TableObject<T>, mapper: (inp: T) => R): TableObject<R> {
+  return Object.fromEntries(Object.entries(tableObject).map(([tableName, value]) => [tableName, mapper(value)]));
+}
