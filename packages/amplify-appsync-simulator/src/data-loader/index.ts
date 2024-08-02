@@ -4,6 +4,12 @@ import { LambdaDataLoader } from './lambda';
 import { OpenSearchDataLoader } from './opensearch';
 
 import { AppSyncSimulatorDataSourceConfig, AppSyncSimulatorDataSourceType } from '../type-definition';
+
+export let reqIdentity: any = undefined;
+export function setLoaderReqIdentity(identity: any) {
+  reqIdentity = identity;
+}
+
 export interface AmplifyAppSyncSimulatorDataLoader {
   load(payload: any, extraData?: any): Promise<object | null>;
 }

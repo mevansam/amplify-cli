@@ -1,4 +1,4 @@
-import { AmplifyAppSyncSimulatorDataLoader } from '..';
+import { AmplifyAppSyncSimulatorDataLoader, reqIdentity } from '..';
 import DataLoader from 'dataloader';
 
 const batchLoaders = {};
@@ -16,13 +16,25 @@ export class LambdaDataLoader implements AmplifyAppSyncSimulatorDataLoader {
   async load(req, extraData) {
     try {
       let result;
+      const { fieldName, parentType } = extraData.info;
       if (req.operation === 'BatchInvoke') {
-        const { fieldName, parentType } = extraData.info;
         const batchName = `${parentType}.${fieldName}`;
         const dataLoader = getBatchDataResolver(batchName, this._config.invoke);
-        result = await dataLoader.load(req.payload);
+        result = await dataLoader.load({
+          arguments: extraData?.args,
+          identity: reqIdentity,
+          source: req.payload,
+          parentTypeName: parentType,
+          fieldName: fieldName,
+        });
       } else {
-        result = await this._config.invoke(req.payload);
+        result = await this._config.invoke({
+          arguments: extraData?.args,
+          identity: reqIdentity,
+          source: req.payload,
+          parentTypeName: parentType,
+          fieldName: fieldName,
+        });
       }
       return result;
     } catch (e) {

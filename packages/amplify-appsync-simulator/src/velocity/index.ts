@@ -8,6 +8,11 @@ import { AppSyncGraphQLExecutionContext } from '../utils';
 import { GraphQLResolveInfo } from 'graphql';
 import { createInfo } from './util/info';
 
+let apiKeyIdentity: any = undefined;
+export function setVtlReqIdentity(identity: any) {
+  apiKeyIdentity = identity;
+}
+
 export type AppSyncSimulatorRequestContext = {
   jwt?: {
     iss?: string;
@@ -104,8 +109,9 @@ export class VelocityTemplate {
 
     const util = createUtil([], new Date(Date.now()), info, requestContext);
     const args = convertToJavaTypes(argument);
-    // Identity is null for API Key
-    let identity = null;
+    // Identity is null for API Key but can be set by the
+    // user to mock behavior of other auth methods if needed
+    let identity = apiKeyIdentity;
     if (requestContext.requestAuthorizationMode === AmplifyAppSyncSimulatorAuthenticationType.OPENID_CONNECT) {
       identity = convertToJavaTypes({
         sub,

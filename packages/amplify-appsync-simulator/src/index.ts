@@ -1,8 +1,8 @@
 import { Source, GraphQLSchema } from 'graphql';
 import slash from 'slash';
 import { generateResolvers } from './schema';
-import { VelocityTemplate } from './velocity';
-import { getDataLoader, AmplifyAppSyncSimulatorDataLoader } from './data-loader';
+import { VelocityTemplate, setVtlReqIdentity } from './velocity';
+import { getDataLoader, AmplifyAppSyncSimulatorDataLoader, setLoaderReqIdentity } from './data-loader';
 import { AppSyncUnitResolver } from './resolvers';
 import { AppSyncSimulatorServer } from './server';
 export { addDataLoader, removeDataLoader } from './data-loader';
@@ -60,6 +60,18 @@ export class AmplifyAppSyncSimulator {
       console.log(e);
       throw e;
     }
+  }
+
+  // Identity is null for API Key but can be set by the
+  // user to mock behavior of other auth methods if needed
+  setReqIdentity(identity: any) {
+    setVtlReqIdentity(identity);
+
+    // TBD: for loaders identity is not retrieve from the
+    //      JWT as done when creating the VtlContext. So
+    //      if loaders need identity then we need to use
+    //      API key identity for now.
+    setLoaderReqIdentity(identity);
   }
 
   reload(config: AmplifyAppSyncSimulatorConfig): void {
